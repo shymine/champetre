@@ -11,7 +11,7 @@ func (rp *repository) Add(model Model) {
 func (rp *repository) Replace(model Model) {
 	for i, el := range rp.elements {
 		if el.Id() == model.Id() {
-			rp.elements[i].Modify(model)
+			rp.elements[i].Update(model)
 			break
 		}
 	}

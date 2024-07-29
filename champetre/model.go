@@ -12,5 +12,5 @@ type Model interface {
 	// Return a map[string]any where string is the name of the parameter and any its value
 	Parameters() map[string]any
 	// Replace the elements inside the model given an element of the same type
-	Modify(Model)
+	Update(Model)
 }

@@ -23,9 +23,9 @@ type Al struct {
 }
 
 func main() {
-	// element := El{"mon", 
+	// element := El{"mon",
 	// 	&El{
-	// 		Message:"yo", 
+	// 		Message:"yo",
 	// 	},
 	// }
 
@@ -60,7 +60,7 @@ func main() {
 	// fmt.Println(refFBN)
 	a := "coucou"       // default
 	b := 3              // default
-	c := []int{3,5,8}   // list 
+	c := []int{3, 5, 8} // list
 	d := El{"blabla"}   // model
 	e := Al{42}         // struct
 	f := []El{d}        // list
@@ -74,10 +74,10 @@ func main() {
 
 func switchPrint(el any) {
 	v := reflect.ValueOf(el)
-	switch v.Kind() {	
-	case reflect.Slice :
+	switch v.Kind() {
+	case reflect.Slice:
 		fmt.Println(v, v.Kind(), "list")
-	case reflect.Map :
+	case reflect.Map:
 		fmt.Println(v, v.Kind(), "map")
 	case reflect.Struct:
 		switch el.(type) {

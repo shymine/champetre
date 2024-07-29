@@ -5,12 +5,15 @@ import (
 	"os"
 
 	"github.com/fatih/structs"
+	collectionsutils "github.com/shymine/collectionsutils"
+	"golang.org/x/exp/maps"
 )
 
 // Is used to build the registry for the database
 type RegistryBuilder struct {
 	registeredType map[Model]string
-	databasePath string
+	// should finish by a "/"
+	databasePath string 
 	databaseName string
 }
 
@@ -66,6 +69,7 @@ func (rb *RegistryBuilder) Compile() registry {
 	}
 
 	channel := make(chan Transaction, 20)
+	// TODO change chan to file writing in transaction.json instead
 	trHandler := transactionHandler{
 			database: rb.databaseName,
 			databasePath: rb.databasePath,
@@ -82,15 +86,27 @@ func (rb *RegistryBuilder) Compile() registry {
 }
 
 // setup the database folder system and files
-// even if the database exist, if there are new collections in the registeredType,
-// they re created
+// even if the database exist, if there are new collections in the registeredType, they re created
+// else create the database folder, the transactions save file and logs
 func (rb *RegistryBuilder) setupDatabase() bool {
 	_, err := os.Stat(rb.databasePath+rb.databaseName)
 	exist := err != nil
-	if exist {
-		collections := rb.getLocalCollections()
-		registered := rb.getModelsName()
+	// get Models Name
+	registered := collectionsutils.Map(
+		maps.Keys(rb.registeredType), 
+		func(l Model) string {return l.Kind()},
+	)
 
+	if exist {
+		registeredModelsToInitialize := rb.getModelsNotInitialized(rb.getLocalCollections(), registered)
+		rb.initializeCollections(registeredModelsToInitialize)
+	} else {
+		if err := os.Mkdir(rb.databasePath+rb.databaseName, os.ModePerm); err != nil {
+			log.Fatal(err)
+		} else {
+			rb.createFiles()
+			rb.initializeCollections(registered)
+		}
 	}
 	return exist
 }
@@ -98,45 +114,7 @@ func (rb *RegistryBuilder) setupDatabase() bool {
 // load the elements from the database and populate the repositories
 func (rb *RegistryBuilder) loadDatabase(repositories map[Model]repository) {
 	// TODO loading of the database
-}
+	// The representation where the referenced documents are not taken in account
+	intermediateRep := rb.setIntermediateRepresentation(repositories)
 
-func (rb *RegistryBuilder) getLocalCollections() []string {
-	entries, err := os.ReadDir(rb.databasePath+rb.databaseName+"/collections")
-	if err != nil {
-		log.Fatal(err)
-	}
-	res := []string{}
-	for _, e := range entries {
-		res = append(res, e.Name())
-	}
-	return res
-}
-
-func (rb *RegistryBuilder) getModelsName() []string {
-	res := make([]string, len(rb.registeredType))
-	i := 0
-	for k, _ := range rb.registeredType {
-		res[i] = k.Kind()
-	}
-	return res
-}
-
-// get the elements from registered that are not in collections
-func (rb* RegistryBuilder) getModelsNotInitialized(collections []string, registered []string) []string {
-	res := []string{}
-	for _, el := range registered {
-		if !contains(collections, el) {
-			res = append(res, el)
-		}
-	}
-	return res
-}
-
-func contains(a []string, el string) bool {
-	for _, e := a {
-		if e == el {
-			return true
-		}
-	}
-	return false
 }

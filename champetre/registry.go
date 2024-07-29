@@ -7,6 +7,7 @@ import (
 
 // Contains the various functions to deal with the database and
 // Index the collections
+// TODO make the chan change to writing to transactions.json
 type registry struct {
 	transactionHandler transactionHandler
 	repositories map[Model]repository

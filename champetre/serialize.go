@@ -29,10 +29,12 @@ func Serialize(model Model) map[string]any {
 }
 
 func SerializeList(l any) []any {
+	// TODO serialize the list 
 	return []any{}
 }
 
 func SerializeMap(m any) map[string]any {
+	// TODO serialize the map
 	return map[string]any{}
 }
 

@@ -2,6 +2,7 @@ package champetre
 
 import "errors"
 
+// TODO make it so insterad of reading from chan, it read every few minutes from transactions.json
 type transactionHandler struct {
 	databasePath string
 	database     string
